@@ -74,9 +74,10 @@ object PlyParser {
             if (bytesRead != stride) break
 
             // Position
+            // Flip Y and Z to correct orientation (convert Y-down to Y-up, etc.)
             val x = wrapper.getFloat(idxX * 4)
-            val y = wrapper.getFloat(idxY * 4)
-            val z = wrapper.getFloat(idxZ * 4)
+            val y = -wrapper.getFloat(idxY * 4)
+            val z = -wrapper.getFloat(idxZ * 4)
             posBuffer.put(x).put(y).put(z)
 
             // Bounds
