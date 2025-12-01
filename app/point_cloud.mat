@@ -1,0 +1,13 @@
+material {
+    name : "Point Cloud",
+    shadingModel : unlit,
+    vertexDomain : device,
+    depthWrite : true,
+    depthTest : true
+}
+fragment {
+    void material(inout MaterialInputs material) {
+        prepareMaterial(material);
+        material.baseColor = getColor();
+    }
+}

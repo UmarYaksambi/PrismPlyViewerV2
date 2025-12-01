@@ -1,0 +1,13 @@
+material {
+    name : "Point Cloud",
+    shadingModel : unlit,
+    // vertexDomain : device  <-- REMOVED: This was causing the compilation error
+    // Standard "object" domain allows the engine to handle vertex attributes like color correctly.
+}
+
+fragment {
+    void material(inout MaterialInputs material) {
+        prepareMaterial(material);
+        material.baseColor = getColor();
+    }
+}
