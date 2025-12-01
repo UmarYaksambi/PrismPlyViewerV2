@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">PlyViewer360</string>
+    <string name="status_preparing">Initializing...</string>
+    <string name="status_parsing">Reading Point Cloud... %1$d%%</string>
+    <string name="status_rendering">Processing...</string>
+    <string name="status_loaded">Ready. %1$d points loaded.</string>
+    <string name="error_prefix">Error: %1$s</string>
+    <string name="back_button_description">Clear and go back</string>
+    <string name="load_fab_description">Load PLY File</string>
+
+    <string name="welcome_title">PLY VIEWER 360</string>
+    <string name="welcome_subtitle">Tap button below to load a 3DGS PLY file</string>
+    <string name="instruction_rotate">• Drag to rotate 360°</string>
+    <string name="instruction_zoom">• Pinch to zoom</string>
+    <string name="instruction_format">• Supports ASCII and binary PLY</string>
 </resources>

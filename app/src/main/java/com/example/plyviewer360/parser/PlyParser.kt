@@ -15,7 +15,7 @@ object PlyParser {
     // Spherical Harmonic Constant (0th degree)
     private const val SH_C0 = 0.28209479177387814f
 
-    suspend fun parse(inputStream: InputStream): SplatPointCloud = withContext(Dispatchers.IO) {
+    suspend fun parse(inputStream: InputStream, onProgress: ((Float) -> Unit)? = null): SplatPointCloud = withContext(Dispatchers.IO) {
         val reader = inputStream.buffered()
 
         // --- 1. Header Parsing ---
@@ -55,7 +55,14 @@ object PlyParser {
         val idxOp = properties.indexOf("opacity")
 
         // --- 4. Fast Binary Read ---
+        var lastProgressUpdate = 0L
+        
         for (i in 0 until vertexCount) {
+            // Progress update every ~1% or time based
+            if (onProgress != null && i % 2000 == 0) {
+                 onProgress(i.toFloat() / vertexCount)
+            }
+
             // CRITICAL FIX: Read fully
             // reader.read(chunk) might not read all 'stride' bytes at once if buffer is fragmented
             var bytesRead = 0

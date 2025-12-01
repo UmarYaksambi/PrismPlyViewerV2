@@ -24,34 +24,66 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.fabLoad.setOnClickListener {
-            // Open file picker
             filePicker.launch(arrayOf("application/octet-stream", "*/*"))
+        }
+
+        binding.btnBack.setOnClickListener {
+            clearViewer()
         }
     }
 
     private fun loadPly(uri: Uri) {
-        binding.progressBar.visibility = View.VISIBLE
+        // UI State: Loading
+        binding.loadingLayout.visibility = View.VISIBLE
+        binding.tvStatus.text = getString(R.string.status_preparing)
+        binding.fabLoad.hide()
+        binding.btnBack.visibility = View.GONE
+        binding.welcomeLayout.visibility = View.GONE
 
         lifecycleScope.launch {
             try {
                 contentResolver.openInputStream(uri)?.use { stream ->
-                    Toast.makeText(this@MainActivity, "Parsing...", Toast.LENGTH_SHORT).show()
+                    binding.tvStatus.text = getString(R.string.status_parsing, 0)
+                    
+                    // Parse in background with progress update
+                    val splatCloud = PlyParser.parse(stream) { progress ->
+                        runOnUiThread {
+                             val percent = (progress * 100).toInt()
+                             binding.tvStatus.text = getString(R.string.status_parsing, percent)
+                             binding.progressBar.isIndeterminate = false
+                             binding.progressBar.progress = percent
+                        }
+                    }
 
-                    // Parse in background
-                    val splatCloud = PlyParser.parse(stream)
-
+                    // Reset progress bar for rendering (which is currently indeterminate or blocking)
+                    runOnUiThread {
+                        binding.tvStatus.text = getString(R.string.status_rendering)
+                        binding.progressBar.isIndeterminate = true
+                    }
+                    
                     // Render
                     binding.viewer.renderer?.loadSplats(splatCloud)
 
-                    binding.progressBar.visibility = View.GONE
-                    binding.fabLoad.hide()
-                    Toast.makeText(this@MainActivity, "Loaded ${splatCloud.splatCount} points", Toast.LENGTH_LONG).show()
+                    // UI State: Loaded
+                    binding.loadingLayout.visibility = View.GONE
+                    binding.btnBack.visibility = View.VISIBLE
+                    
+                    Toast.makeText(this@MainActivity, getString(R.string.status_loaded, splatCloud.splatCount), Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                binding.progressBar.visibility = View.GONE
-                Toast.makeText(this@MainActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                binding.loadingLayout.visibility = View.GONE
+                binding.fabLoad.show()
+                binding.welcomeLayout.visibility = View.VISIBLE
+                Toast.makeText(this@MainActivity, getString(R.string.error_prefix, e.message), Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    private fun clearViewer() {
+        binding.viewer.renderer?.clear()
+        binding.btnBack.visibility = View.GONE
+        binding.fabLoad.show()
+        binding.welcomeLayout.visibility = View.VISIBLE
     }
 }

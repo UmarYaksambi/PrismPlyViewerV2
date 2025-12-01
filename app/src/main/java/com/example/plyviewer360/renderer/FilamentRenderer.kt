@@ -118,6 +118,14 @@ class FilamentRenderer(val context: Context, surface: Surface) {
         updateCamera()
     }
 
+    fun clear() {
+        if (splatEntity != 0) {
+            scene.remove(splatEntity)
+            engine.destroyEntity(splatEntity)
+            splatEntity = 0
+        }
+    }
+
     private fun updateCamera() {
         val radX = Math.toRadians(rotX.toDouble())
         val radY = Math.toRadians(rotY.toDouble())
